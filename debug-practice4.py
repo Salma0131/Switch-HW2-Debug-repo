@@ -1,10 +1,12 @@
 import random
 from datetime import datetime, timedelta
 
+
 class Person:
     def __init__(self, name, age):
         self.name = name
         self.age = age
+
 
 class Student(Person):
     def __init__(self, name, age, student_id):
@@ -12,7 +14,7 @@ class Student(Person):
         self.student_id = student_id
         self.courses = []
         self.grades = {}
-        self.attendance = {} 
+        self.attendance = {}
 
     def enroll(self, course):
         if course not in self.courses:
@@ -36,12 +38,12 @@ class Student(Person):
         total_grade = sum(sum(grades) for grades in self.grades.values())
         total_courses = sum(len(grades) for grades in self.grades.values())
         return total_grade / total_courses if total_courses > 0 else 0
-    
 
     def record_attendance(self, course, date, present):
         if course not in self.attendance:
             self.attendance[course] = {}
         self.attendance[course][date] = present
+
 
 class Teacher(Person):
     def __init__(self, name, age, employee_id):
@@ -56,6 +58,7 @@ class Teacher(Person):
             print(f"{self.name} assigned to teach {course.name}")
         else:
             print(f"{self.name} is already teaching {course.name}")
+
 
 class Course:
     def __init__(self, name, course_id):
@@ -78,13 +81,16 @@ class Course:
 
     def add_schedule(self, day, time):
         self.schedule.append((day, time))
-    
+
     def get_average_grade(self):
         if not self.students:
             return 0
-        total_grades = sum(sum(student.grades[self]) for student in self.students)
-        total_grades_count = sum(student.grades[self] for student in self.students)
+        total_grades = sum(sum(student.grades[self])
+                           for student in self.students)
+        total_grades_count = sum(
+            len(student.grades[self]) for student in self.students)
         return total_grades / total_grades_count if total_grades_count > 0 else 0
+
 
 class School:
     def __init__(self, name):
@@ -122,7 +128,7 @@ class School:
             if course.course_id == course_id:
                 return course
         return None
-    
+
     def get_students_with_failed_grades(self, fail_threshold=60):
         failed_students = []
         for student in self.students:
@@ -133,25 +139,29 @@ class School:
         return failed_students
 
     def get_top_performing_students(self, top_n=5):
-        students_with_gpa = [(student, student.calculate_gpa()) for student in self.students]
+        students_with_gpa = [(student, student.calculate_gpa())
+                             for student in self.students]
         return sorted(students_with_gpa, key=lambda x: x[1], reverse=True)[:top_n]
 
     def get_courses_with_highest_average_grades(self, top_n=3):
-        courses_with_avg = [(course, course.get_average_grade()) for course in self.courses]
+        courses_with_avg = [(course, course.get_average_grade())
+                            for course in self.courses]
         return sorted(courses_with_avg, key=lambda x: x[1], reverse=True)[:top_n]
 
     def get_teachers_with_most_students(self, top_n=3):
-        teacher_student_count = [(teacher, sum(len(course.students) for course in teacher.courses)) for teacher in self.teachers]
+        teacher_student_count = [(teacher, sum(
+            len(course.students) for course in teacher.courses)) for teacher in self.teachers]
         return sorted(teacher_student_count, key=lambda x: x[1], reverse=True)[:top_n]
 
     def get_students_with_perfect_attendance(self):
         perfect_attendance = []
         for student in self.students:
-            has_perfect_attendance = all(all(present for present in course_attendance.values()) 
+            has_perfect_attendance = all(all(present for present in course_attendance.values())
                                          for course_attendance in student.attendance.values())
             if has_perfect_attendance:
                 perfect_attendance.append(student)
         return perfect_attendance
+
 
 def generate_demo_data(school):
     # Generate Students
@@ -172,11 +182,11 @@ def generate_demo_data(school):
     for i, course_name in enumerate(courses, 1):
         course = Course(course_name, f"C{100+i}")
         school.add_course(course)
-        
+
         # Assign a random teacher to the course
         teacher = random.choice(school.teachers)
         teacher.assign_course(course)
-        
+
         # Add a random schedule
         days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
         times = ["09:00", "11:00", "14:00", "16:00"]
@@ -197,14 +207,14 @@ def generate_demo_data(school):
                 grade = random.randint(40, 100)
                 student.assign_grade(course, grade)
 
-    
     # Generate attendance data
     start_date = datetime.now() - timedelta(days=30)
     for _ in range(30):
         current_date = start_date + timedelta(days=_)
         for student in school.students:
             for course in student.courses:
-                student.record_attendance(course, current_date, random.choice([True, True, True, False]))  # 75% chance of being present
+                student.record_attendance(course, current_date, random.choice(
+                    [True, True, True, False]))  # 75% chance of being present
 
 
 def print_school_stats(school):
@@ -212,33 +222,37 @@ def print_school_stats(school):
     print(f"Total Students: {len(school.students)}")
     print(f"Total Teachers: {len(school.teachers)}")
     print(f"Total Courses: {len(school.courses)}")
-    
+
     # Average GPA
     total_gpa = sum(student.calculate_gpa() for student in school.students)
     avg_gpa = total_gpa / len(school.students) if school.students else 0
     print(f"Average GPA: {avg_gpa:.2f}")
-    
+
     # Most popular course
-    course_popularity = {course: len(course.students) for course in school.courses}
+    course_popularity = {course: len(course.students)
+                         for course in school.courses}
     most_popular = max(course_popularity, key=course_popularity.get)
-    print(f"Most Popular Course: {most_popular.name} ({course_popularity[most_popular]} students)")
+    print(
+        f"Most Popular Course: {most_popular.name} ({course_popularity[most_popular]} students)")
 
     # print_school_stats(school):
     print(f"\n--- {school.name} Statistics ---")
     print(f"Total Students: {len(school.students)}")
     print(f"Total Teachers: {len(school.teachers)}")
     print(f"Total Courses: {len(school.courses)}")
-    
+
     # Average GPA
     total_gpa = sum(student.calculate_gpa() for student in school.students)
     avg_gpa = total_gpa / len(school.students) if school.students else 0
     print(f"Average GPA: {avg_gpa:.2f}")
-    
+
     # Most popular course
-    course_popularity = {course: len(course.students) for course in school.courses}
+    course_popularity = {course: len(course.students)
+                         for course in school.courses}
     most_popular = max(course_popularity, key=course_popularity.get)
-    print(f"Most Popular Course: {most_popular.name} ({course_popularity[most_popular]} students)")
-    
+    print(
+        f"Most Popular Course: {most_popular.name} ({course_popularity[most_popular]} students)")
+
     # Top 3 performing students
     print("\nTop 3 Performing Students:")
     top_students = school.get_top_performing_students(3)
@@ -259,12 +273,12 @@ def print_school_stats(school):
 
     # Students with perfect attendance
     perfect_attendance = school.get_students_with_perfect_attendance()
-    print(f"\nNumber of Students with Perfect Attendance: {len(perfect_attendance)}")
+    print(
+        f"\nNumber of Students with Perfect Attendance: {len(perfect_attendance)}")
 
     # Students with failed grades
     failed_students = school.get_students_with_failed_grades(50)
     print(f"\nNumber of Students with Failed Grades: {len(failed_students)}")
-
 
 
 if __name__ == "__main__":
